@@ -5,6 +5,11 @@ package com.example.springboot_securitydemo.models;
 
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
+
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,10 +22,16 @@ public class User {
     @Column(name = "id")
     private Integer id;
     @Column(name = "name",unique = true,nullable = false)
+    @NotEmpty(message = "Name shouldn't be empty")
+    @Size(min = 3,max = 25, message = "Name size should be between 3 to 25 characters")
     private String name;
     @Column(name = "age")
+    @Min(value = 0, message = "Your age can't be less than 0")
+    @Max(value = 100, message = "You're too old to be there")
     private Integer age;
     @Column(name = "password", nullable = false)
+    @NotEmpty(message = "Password shouldn't be empty")
+    @Size(min = 8, max = 50, message = "Your password should be between 8 to 50 characters")
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
