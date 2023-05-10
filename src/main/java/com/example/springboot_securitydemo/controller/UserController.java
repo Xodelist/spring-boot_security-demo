@@ -1,56 +1,25 @@
 package com.example.springboot_securitydemo.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.springboot_securitydemo.security.UserDetailsImpl;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import com.example.springboot_securitydemo.models.User;
-import com.example.springboot_securitydemo.service.UserService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/users")
+@RequestMapping("/user")
 public class UserController {
 
-    private final UserService service;
-
-    @Autowired
-    public UserController(UserService service) {
-        this.service = service;
-    }
-
-    @GetMapping("/{id}")
-    public String showUser(Model model, @PathVariable("id") int id) {
-        model.addAttribute("user", service.getUserById(id));
-        return "show";
-    }
+    @PreAuthorize(value = "hasAnyRole('ROLE_USER','ROLE_ADMIN')")
     @GetMapping
-    public String showAllUsers(Model model) {
-        model.addAttribute("users", service.getUsers());
-        return "index";
-    }
-    @GetMapping("/{id}/edit")
-    public String editUserPage(Model model, @PathVariable("id") int id) {
-        model.addAttribute("user", service.getUserById(id));
-        return "edit";
-    }
-    @PatchMapping("/{id}/edit")
-    public String editUser(@ModelAttribute("user") User user, @PathVariable("id") int id) {
-        service.updateUser(user,id);
-        return "redirect:/users";
-    }
-    @GetMapping("/new")
-    public String saveUserPage(Model model) {
-        model.addAttribute("user", new User());
-        return "new";
-    }
-    @PostMapping
-    public String saveUser(@ModelAttribute("user") User user) {
-        service.saveUser(user);
-        return "redirect:/users";
-    }
-    @DeleteMapping("/{id}")
-    public String deleteUserById(@PathVariable("id") int id) {
-        service.deleteUserById(id);
-        return "redirect:/users";
+    public String getInfo(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        model.addAttribute("user",((UserDetailsImpl) authentication.getPrincipal()).getUser());
+        return "showinfo";
     }
 }

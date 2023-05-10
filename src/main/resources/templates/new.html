@@ -5,14 +5,21 @@
     <title>New User</title>
 </head>
 <body>
-<form th:method="POST" th:action="@{/users}" th:object="${user}">
+<form th:method="POST" th:action="@{/admin}" th:object="${user}">
     <label for="name"> Enter name</label>
-    <input type="text" th:field="*{first_name}" id="name">
+    <input type="text" th:field="*{name}" id="name">
     <br/>
     <label for="age">Enter age</label>
     <input type="number" th:field="*{age}" id="age">
     <br/>
+    <label for="password">Enter password</label>
+    <input type="password" th:field="*{password}" id="password">
+    <br/>
     <input type="submit" value="Add">
+</form>
+<br/>
+<form th:method="GET" th:action="@{/logout}">
+    <input type="submit" value="Logout"/>
 </form>
 
 </body>

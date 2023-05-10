@@ -5,14 +5,18 @@
     <title>User</title>
 </head>
 <body>
-<a th:text="${user.getFirst_name() + ' ' + user.getAge()}">
-
-</a>
-<form th:method="DELETE" th:action="@{/users/{id}(id = ${user.getId()})}">
+<a th:text="${'Name : ' + user.getName()}"/>
+<br/>
+<a th:text="${'Age : ' + user.getAge()}"/>
+<form th:method="DELETE" th:action="@{/admin/{id}(id = ${user.getId()})}">
     <input type="submit" value="Delete">
 </form>
-<form th:method="GET" th:action="@{/users/{id}/edit(id = ${user.getId()})}">
+<form th:method="GET" th:action="@{/admin/{id}/edit(id = ${user.getId()})}">
     <input type="submit" value="Edit">
+</form>
+<br/>
+<form th:method="GET" th:action="@{/logout}">
+    <input type="submit" value="Logout"/>
 </form>
 </body>
 </html>

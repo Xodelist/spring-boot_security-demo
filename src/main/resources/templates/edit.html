@@ -5,14 +5,21 @@
     <title>Edit user</title>
 </head>
 <body>
-<form th:method="PATCH" th:action="@{/users/{id}/edit(id = ${user.getId()})}" th:object="${user}">
-    <label for="name"> Enter name</label>
-    <input type="text" th:field="*{first_name}" id="name">
+<form th:method="PATCH" th:action="@{/admin/{id}/edit(id = ${user.getId()})}" th:object="${user}">
+    <label for="username"> Enter name</label>
+    <input type="text" th:field="*{name}" id="username">
     <br/>
     <label for="age"> Enter age</label>
     <input type="number" th:field="*{age}" id="age">
     <br/>
+    <label for="password">Enter password</label>
+    <input type="password" th:field="*{password}" id="password">
+    <br/>
     <input type="submit" value="Edit">
+</form>
+<br/>
+<form th:method="GET" th:action="@{/logout}">
+    <input type="submit" value="Logout"/>
 </form>
 </body>
 </html>
