@@ -11,11 +11,13 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 public class User {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +32,6 @@ public class User {
     @Max(value = 100, message = "You're too old to be there")
     private Integer age;
     @Column(name = "password", nullable = false)
-    @NotEmpty(message = "Password shouldn't be empty")
-    @Size(min = 8, max = 50, message = "Your password should be between 8 to 50 characters")
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -42,6 +42,7 @@ public class User {
 
     )
     private Set<Role> roles = new HashSet<>();
+
 
     public User(String name, Integer age) {
         this.name = name;
@@ -87,7 +88,12 @@ public class User {
         return roles;
     }
 
+    public String getRolesAsString() {
+        return Arrays.toString(roles.toArray());
+    }
+
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
+
 }

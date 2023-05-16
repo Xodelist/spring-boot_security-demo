@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Column;
 
+
 @Entity
 @Table(name = "role")
 public class Role implements GrantedAuthority {
@@ -53,5 +54,10 @@ public class Role implements GrantedAuthority {
     @Override
     public String getAuthority() {
         return this.rolename;
+    }
+
+    @Override
+    public String toString() {
+        return rolename;
     }
 }

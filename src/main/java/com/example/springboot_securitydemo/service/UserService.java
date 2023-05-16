@@ -7,6 +7,7 @@ import com.example.springboot_securitydemo.models.User;
 import com.example.springboot_securitydemo.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,6 +37,11 @@ public class UserService {
     @Transactional
     public void deleteUserById(int id) {
         repository.deleteById(id);
+    }
+
+    @Transactional
+    public Optional<User> findUserByName(String name) {
+        return repository.findUserByName(name);
     }
 
 }

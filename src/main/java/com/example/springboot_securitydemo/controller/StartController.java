@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping
 public class StartController {
+
     @GetMapping
     public String start() {
         return "redirect:/login";
     }
+
 }
