@@ -11,6 +11,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,9 +30,10 @@ public class User {
     private String name;
     @Column(name = "age")
     @Min(value = 0, message = "Your age can't be less than 0")
-    @Max(value = 100, message = "You're too old to be there")
+    @Max(value = 100, message = " Your age should be less than 100")
     private Integer age;
     @Column(name = "password", nullable = false)
+    @Size(min = 8,message = "Password should be at least 8 characters")
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
