@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" >
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -17,7 +17,7 @@
 
 
 </head>
-<body onload="refreshTable()">
+<body onload="refreshTable();updateCurrentUser()">
 <div class="container-fluid">
 
 
@@ -25,7 +25,7 @@
     <div class="row bg-dark">
         <div class="col-md-11">
             <h3>
-<!--                <a th:text= "'User : ' + ${user.getName()} + ' with roles : '+ ${user.getRolesAsString()}" style="color: white">testing  </a>-->
+                <p style="color: white" id="currentInfo" ></p>
             </h3>
         </div>
         <div class="col-md-1">
@@ -50,24 +50,16 @@
                     <div class="col-md-10">
 
                         <h3 class="text-left"> User info </h3>
-
                         <table class="table">
 
                             <thead>
                             <tr>
-                                <th> ID </th>
-                                <th> Name </th>
-                                <th> Age </th>
-                                <th> Roles </th>
+                                <th> ID </th><th> Name </th><th> Age </th><th> Roles </th>
                             </tr>
                             </thead>
 
                             <tbody>
-                            <tr>
-                                <td id="currentUserId" > </td>
-                                <td id="currentUserName" > </td>
-                                <td id="currentUserAge" > </td>
-                                <td id="currentUserRoles" > </td>
+                            <tr id="currentRow">
                             </tr>
                             </tbody>
 
@@ -93,12 +85,7 @@
 
                                 <thead>
                                 <tr>
-                                    <th> ID </th>
-                                    <th> Name </th>
-                                    <th> Age </th>
-                                    <th> Roles </th>
-                                    <th> Edit </th>
-                                    <th> Delete </th>
+                                    <th> ID </th><th> Name </th><th> Age </th><th> Roles </th><th> Edit </th><th> Delete </th>
                                 </tr>
                                 </thead>
 
@@ -121,17 +108,17 @@
 
                                 <div class="mb-3">
                                     <label for="inputName" class="form-label">Name</label>
-                                    <input  th:object="${newUser}" th:field="*{name}" type="text" class="form-control" id="inputName"  required>
+                                    <input type="text" class="form-control" id="inputName"  required>
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="inputAge" class="form-label">Age</label>
-                                    <input th:object="${newUser}" th:field="*{age}" type="number" class="form-control" id="inputAge" required>
+                                    <input type="number" class="form-control" id="inputAge" required>
                                 </div>
 
                                     <div class="mb-3">
                                         <label for="inputRole" class="form-label">Role </label>
-                                        <select  th:object="${newRole}" th:field="*{rolename}" class="form-select" size="2" id="inputRole" required>
+                                        <select class="form-select" size="2" id="inputRole" required>
                                             <option value="ROLE_USER">USER</option>
                                             <option value="ROLE_ADMIN">ADMIN</option>
                                         </select>
@@ -139,11 +126,11 @@
 
                                     <div class="mb-3">
                                         <label for="inputPassword" class="form-label">Password</label>
-                                        <input th:object="${newUser}" th:field="*{password}" type="password" class="form-control" id="inputPassword" required>
+                                        <input type="password" class="form-control" id="inputPassword" required>
                                     </div>
 
                                     <div class="d-flex justify-content-center">
-                                        <button onclick="create(constructNewUser()); refreshTable()" type="button" class="btn btn-success">Add user</button>
+                                        <button onclick="create(constructNewUser())" type="button" class="btn btn-success">Add user</button>
                                     </div>
 
 
@@ -179,25 +166,30 @@
 
                         <div class="mb-3">
                             <label for="deleteName" class="form-label">Name</label>
-                            <input  th:object="${newUser}" th:field="*{name}" type="text" class="form-control" id="deleteName"  disabled readonly>
+                            <input type="text" class="form-control" id="deleteName"  disabled readonly>
                         </div>
 
                         <div class="mb-3">
                             <label for="deleteAge" class="form-label">Age</label>
-                            <input th:object="${newUser}" th:field="*{age}" type="number" class="form-control" id="deleteAge" disabled readonly>
+                            <input type="number" class="form-control" id="deleteAge" disabled readonly>
                         </div>
 
                         <div class="mb-3">
                             <label for="deleteRole" class="form-label">Role </label>
-                            <select th:object="${newRole}" th:field="*{rolename}" class="form-select" size="2" id="deleteRole" disabled>
+                            <select class="form-select" size="2" id="deleteRole" disabled>
                                 <option value="ROLE_USER" >USER</option>
                                 <option value="ROLE_ADMIN">ADMIN</option>
                             </select>
                         </div>
 
                         <div class="d-flex justify-content-center">
-                            <button onclick="remove(constructId()); refreshTable()" type="button" class="btn btn-danger">Delete user</button>
+                            <button onclick="remove(constructId())" type="submit" class="btn btn-danger" data-bs-dismiss="modal">Delete user</button>
                         </div>
+                        <script>
+                            $('#deleteForm').submit(function(e) {
+                                e.preventDefault();
+                            });
+                        </script>
 
                     </form>
 
@@ -210,7 +202,7 @@
     </div>
 
     <!-- Модальное окно редактирования пользователя-->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
 
@@ -218,7 +210,7 @@
 
                     <h1 class="modal-title fs-5" id="exampleModalLabel"> Edit user </h1>
 
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="clearForm()"></button>
 
                 </div>
 
@@ -233,29 +225,42 @@
 
                         <div class="mb-3">
                             <label for="editName" class="form-label">Name</label>
-                            <input th:object="${newUser}" th:field="*{name}" type="text" class="form-control" id="editName"  required>
+                            <input type="text" class="form-control" id="editName"  required>
                         </div>
 
                         <div class="mb-3">
                             <label for="editAge" class="form-label">Age</label>
-                            <input th:object="${newUser}" th:field="*{age}" type="number" class="form-control" id="editAge" required>
+                            <input type="number" class="form-control" id="editAge" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="editRole" class="form-label">Role </label>
-                            <select th:object="${newRole}" th:field="*{rolename}" class="form-select" size="2" id="editRole" required>
+                            <select class="form-select" size="2" id="editRole" required>
                                 <option value="ROLE_USER">USER</option>
                                 <option value="ROLE_ADMIN">ADMIN</option>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="editPassword" class="form-label">Password</label>
-                            <input th:object="${newUser}" th:field="*{password}" type="password" class="form-control" id="editPassword">
+                            <input type="password" class="form-control" id="editPassword">
                         </div>
 
                         <div class="d-flex justify-content-center">
-                            <button type="button" class="btn btn-success" onclick="edit(constructUser())">Edit user</button>
+                            <button type="submit" class="btn btn-success" onclick="edit(constructUser())" data-bs-dismiss="modal">Edit user</button>
                         </div>
+                        <script>
+                            $('#editForm').submit(function(e) {
+                                e.preventDefault();
+                                });
+                        </script>
+                        <script>
+                        function clearForm() {
+                        document.getElementById("editForm").reset();
+                        document.getElementById("newForm").reset();
+                        }
+                        </script>
+
+
                     </form>
 
                 </div>
@@ -339,42 +344,33 @@
     });
 
 </script>
-<script>
-    fetch("http://localhost:8080/admin/current")
-        .then(response => response.json())
-        .then(result => {
-            document.getElementById('currentUserId').insertAdjacentHTML('afterbegin',result['id']);
-            document.getElementById('currentUserName').insertAdjacentHTML('afterbegin',result['name']);
-            document.getElementById('currentUserAge').insertAdjacentHTML('afterbegin',result['age']);
-            document.getElementById('currentUserRoles').insertAdjacentHTML('afterbegin',result['rolesAsString']);
 
-        })
-        .catch(error => console.log('error', error));
-</script>
 <script>
-    function setForm(id,name,age) {
-        // document.getElementById("editForm").setAttribute('action','/admin/' + id);
-        document.getElementById("editName").setAttribute('value',name);
-        document.getElementById("editAge").setAttribute('value',age);
-        document.getElementById("showId").setAttribute('value',id);
-        // document.getElementById('deleteForm').setAttribute('action','/admin/' + id);
-        document.getElementById('deleteName').setAttribute('value',name);
-        document.getElementById('deleteAge').setAttribute('value',age);
-        document.getElementById('deleteId').setAttribute('value',id);
+
+
+    async function setForm(user) {
+
+        document.getElementById('showId').setAttribute('value',user['id']);
+        document.getElementById('deleteId').setAttribute('value',user['id'])
+        document.getElementById('editName').defaultValue = user['name'];
+        document.getElementById('deleteName').setAttribute('value',user['name'])
+        document.getElementById('editAge').setAttribute('value',user['age'])
+        document.getElementById('deleteAge').setAttribute('value',user['age'])
         console.log('done)')
+
     }
 </script>
 <script>
-    function refreshTable() {
+    async function refreshTable() {
         let finalHtml = ''
         const table = document.getElementById("usersTableBody");
         fetch("http://localhost:8080/admin/users")
             .then(response => response.json())
             .then(res => {
                 res.forEach(function (user) {
-                    var username = user['name'].toString();
                     finalHtml = finalHtml +
-                        '<tr onclick="setForm(' + user['id'] + ', \'' + username + '\',' + user['age'] + ')"> <td> ' + user['id'] + ' </td>' +
+                        '<tr onclick="fetchById(' + user['id'] + ')' + '"' + '>' +
+                        '<td>' + user['id'] + '</td>' +
                         ' <td> ' + user['name'] + ' </td>' +
                         ' <td> ' + user['age'] + ' </td>' +
                         '<td> ' + user['rolesAsString'] + ' </td>' +
@@ -390,30 +386,34 @@
         'Content-Type': 'application/json'
     });
 
-    function edit(user) {
-        fetch("http://localhost:8080/admin", {
+    async function edit(user) {
+        await fetch("http://localhost:8080/admin", {
             method: "PATCH",
-            headers : headers,
+            headers: headers,
             body: user
         })
-        refreshTable()
-
+        await refreshTable();
+        await updateCurrentUser();
+        clearForm();
     }
 
-    function remove(userid) {
-        fetch('http://localhost:8080/admin', {
-            method : "DELETE",
-            headers : headers,
-            body : userid
+    async function remove(userid) {
+        await fetch('http://localhost:8080/admin', {
+            method: "DELETE",
+            headers: headers,
+            body: userid
         })
-        refreshTable()
+        await refreshTable()
     }
-    function create(user) {
-        fetch('http://localhost:8080/admin', {
-            method : 'POST',
-            headers : headers,
-            body : user
+    async function create(user) {
+        await fetch('http://localhost:8080/admin', {
+            method: 'POST',
+            headers: headers,
+            body: user
         })
+        await refreshTable()
+        await showTab()
+        clearForm();
     }
 
 </script>
@@ -446,6 +446,9 @@
         if (age === undefined) {
             age = document.getElementById('editAge').getAttribute('value')
         }
+        if (role === undefined) {
+
+        }
         let result = {
             user : {
                 id : id,
@@ -477,6 +480,40 @@
         return JSON.stringify(result)
     }
 </script>
+<script>
+    async function showTab() {
+        const bsTab = new bootstrap.Tab('#table-tab');
+        bsTab.show();
+    }
+</script>
+<script>
 
+    async function updateCurrentUser() {
+        await fetch("http://localhost:8080/admin/current")
+            .then(response => response.json())
+            .then(user => {
+                document.getElementById("currentInfo").innerHTML = "User : " + user['name'] + ' with roles : '+ user['rolesAsString']
+                document.getElementById("currentRow").innerHTML =
+                    "<td>" + user['id'] + "</td>" +
+                    "<td>" + user['name'] + "</td>" +
+                    "<td>" + user['age'] + "</td>" +
+                    "<td>" + user['rolesAsString'] + "</td>"
+            })
+    }
+
+
+    async function fetchById(userid) {
+        fetch("http://localhost:8080/admin/users")
+            .then(response => response.json())
+            .then(res => {
+                res.forEach(function (user) {
+                    if (user['id'] === userid) {
+                        result = user;
+                        setForm(user);
+                    }
+                })
+            })
+    }
+</script>
 </body>
 </html>

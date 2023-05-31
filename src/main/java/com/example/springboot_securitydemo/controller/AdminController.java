@@ -1,7 +1,5 @@
 package com.example.springboot_securitydemo.controller;
 
-import com.example.springboot_securitydemo.models.Role;
-import com.example.springboot_securitydemo.models.TestEntity;
 import com.example.springboot_securitydemo.models.UserDTO;
 import com.example.springboot_securitydemo.security.UserDetailsImpl;
 import com.example.springboot_securitydemo.service.RoleService;
@@ -13,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,7 +39,7 @@ public class AdminController {
         this.userService = service;
         this.roleService = roleService;
     }
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseBody
     @PatchMapping()
     public ResponseEntity<HttpStatus> editUser( @RequestBody @Valid UserDTO updatedUser, BindingResult result) {
@@ -57,16 +54,17 @@ public class AdminController {
         }
         if (!result.hasErrors()) {
             if (!roleService.findByRolename(updatedUser.getRoleName()).isPresent()) {
-                updatedUser.getUser().setRoles(Collections.singleton(roleService.findByRolename(updatedUser.getRoleName()).get()));
+                updatedUser.getUser().setRoles(userService.getUserById(updatedUser.getUser().getId()).getRoles());
             } else {
                 updatedUser.getUser().setRoles(Collections.singleton(roleService.findByRolename(updatedUser.getRoleName()).get()));
             }
             userService.updateUser(updatedUser.getUser(),updatedUser.getUser().getId() );
+            return ResponseEntity.ok(HttpStatus.OK);
         }
-        return ResponseEntity.ok(HttpStatus.OK); /// тут не должно быть ОК
+        return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseBody
     @PostMapping()
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid UserDTO newUser, BindingResult result) {
@@ -93,14 +91,14 @@ public class AdminController {
 
     @ResponseBody
     @GetMapping("/current")
-//    @PreAuthorize("hasAnyRole('ROLE_USER','ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_USER','ROLE_ADMIN')")
     public User getCurrent() {
         return userService.getUserById(
                 ((UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
                         .getUser().getId()
         );
     }
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseBody
     @GetMapping("/users")
     public List<User> getUsers() {
@@ -108,7 +106,7 @@ public class AdminController {
         return userService.getUsers();
     }
 
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseBody
     @GetMapping("/{id}")
     public User getUser(@PathVariable("id") int id) {
@@ -117,7 +115,7 @@ public class AdminController {
 
 
 
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseBody
     @DeleteMapping()
     public ResponseEntity<HttpStatus> deleteUserById(@RequestBody ServiceLay lay) {
@@ -127,15 +125,6 @@ public class AdminController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping()
     public String adminPage(Model model) {
-        StringBuilder names = new StringBuilder();
-        userService.getUsers().forEach( user -> names.append(user.getName()).append(" ") );
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        model.addAttribute("users", userService.getUsers());
-//        model.addAttribute("user", ((UserDetailsImpl) authentication.getPrincipal()).getUser());
-        model.addAttribute("newUser", new User());
-        model.addAttribute("newRole", new Role());
-        model.addAttribute("usernames",names.toString());
-        model.addAttribute("service", userService);
         return "admininfo";
     }
 
@@ -154,17 +143,6 @@ public class AdminController {
                 System.currentTimeMillis()
         );
         return new ResponseEntity<>(response,HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
-    @GetMapping("/test")
-    public String test() {
-        return "test";
-    }
-    @ResponseBody
-    @PostMapping("/test")
-    public ResponseEntity<HttpStatus> test(@RequestBody TestEntity entity) {
-        System.out.println(entity.getName());
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
 }
